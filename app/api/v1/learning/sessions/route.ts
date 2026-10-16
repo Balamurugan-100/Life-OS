@@ -1,0 +1,5 @@
+import { NextRequest } from "next/server";
+import { requireAgent } from "@/lib/learning/agent-auth";
+import { sessionCreateSchema } from "@/lib/learning/schema";
+import { apiError, apiResponse } from "@/lib/learning/service";
+export async function POST(request: NextRequest) { const agent = await requireAgent(request, "learning:progress"); if (!agent) return apiError("UNAUTHORIZED", "A learning:progress API key is required", 401); const parsed = sessionCreateSchema.safeParse(await request.json()); if (!parsed.success) return apiError("VALIDATION_ERROR", "Invalid session", 422); const { data, error } = await agent.supabase.from("learning_sessions").insert({ path_id: parsed.data.pathId, item_id: parsed.data.itemId || null, duration_minutes: parsed.data.durationMinutes, note: parsed.data.note || null, occurred_at: parsed.data.occurredAt || new Date().toISOString(), actor_kind: "agent" }).select().single(); return error ? apiError("DATABASE_ERROR", error.message, 500) : apiResponse(data, 201); }

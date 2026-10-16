@@ -1,0 +1,5 @@
+import { NextRequest } from "next/server";
+import { requireAgent } from "@/lib/learning/agent-auth";
+import { evidenceCreateSchema } from "@/lib/learning/schema";
+import { apiError, apiResponse } from "@/lib/learning/service";
+export async function POST(request: NextRequest) { const agent = await requireAgent(request, "learning:progress"); if (!agent) return apiError("UNAUTHORIZED", "A learning:progress API key is required", 401); const parsed = evidenceCreateSchema.safeParse(await request.json()); if (!parsed.success) return apiError("VALIDATION_ERROR", parsed.error.issues[0]?.message || "Invalid evidence", 422); const { data, error } = await agent.supabase.from("learning_evidence").insert({ path_id: parsed.data.pathId, item_id: parsed.data.itemId || null, kind: parsed.data.kind, title: parsed.data.title || null, body: parsed.data.body || null, url: parsed.data.url || null, author_kind: "agent" }).select().single(); return error ? apiError("DATABASE_ERROR", error.message, 500) : apiResponse(data, 201); }

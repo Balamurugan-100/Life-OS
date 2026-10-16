@@ -1,0 +1,8 @@
+import { NextRequest } from "next/server";
+import { getAuthenticatedUser } from "@/lib/supabase/api-auth";
+import { apiKeyCreateSchema } from "@/lib/learning/schema";
+import { apiError, apiResponse } from "@/lib/learning/service";
+import { hashApiKey, makeApiKey } from "@/lib/learning/agent-auth";
+
+export async function GET(request: NextRequest) { const { user, supabase } = await getAuthenticatedUser(request); if (!user) return apiError("UNAUTHORIZED", "Sign in required", 401); const { data, error } = await supabase.from("personal_api_keys").select("id,name,key_prefix,scopes,expires_at,last_used_at,revoked_at,created_at").eq("user_id", user.id).order("created_at", { ascending: false }); return error ? apiError("DATABASE_ERROR", error.message, 500) : apiResponse(data); }
+export async function POST(request: NextRequest) { const { user, supabase } = await getAuthenticatedUser(request); if (!user) return apiError("UNAUTHORIZED", "Sign in required", 401); const parsed = apiKeyCreateSchema.safeParse(await request.json()); if (!parsed.success) return apiError("VALIDATION_ERROR", parsed.error.issues[0]?.message || "Invalid key", 422); const secret = makeApiKey(); const { data, error } = await supabase.from("personal_api_keys").insert({ user_id: user.id, name: parsed.data.name, key_prefix: secret.slice(0, 12), key_hash: hashApiKey(secret), scopes: parsed.data.scopes, expires_at: parsed.data.expiresAt || null }).select("id,name,key_prefix,scopes,expires_at,created_at").single(); return error ? apiError("DATABASE_ERROR", error.message, 500) : apiResponse({ key: secret, ...data }, 201); }

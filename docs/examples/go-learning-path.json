@@ -1,0 +1,41 @@
+{
+  "externalSourceId": "go-foundations-2026",
+  "title": "Go: from fundamentals to production services",
+  "slug": "go-production-services",
+  "summary": "Build fluency in Go, then ship a concurrent HTTP service with real operational habits.",
+  "category": "programming",
+  "desiredOutcome": "Design, implement, test, and operate a small Go service independently.",
+  "weeklyMinutesTarget": 300,
+  "modules": [
+    {
+      "externalId": "go-language",
+      "title": "The Go mental model",
+      "purpose": "Write idiomatic Go without translating habits from another language.",
+      "successCriteria": "Explain values, pointers, interfaces, errors, and packages in a code review.",
+      "items": [
+        { "externalId": "tour", "title": "Complete the Tour of Go", "kind": "lesson", "estimatedMinutes": 120 },
+        { "externalId": "cli", "title": "Build a small command-line JSON formatter", "kind": "exercise", "estimatedMinutes": 90, "evidenceRequired": true }
+      ]
+    },
+    {
+      "externalId": "go-concurrency",
+      "title": "Concurrency and cancellation",
+      "purpose": "Use goroutines, channels, contexts, and synchronization deliberately.",
+      "prerequisites": ["go-language"],
+      "items": [
+        { "externalId": "pipeline", "title": "Implement a cancellable worker pipeline", "kind": "exercise", "estimatedMinutes": 120, "evidenceRequired": true },
+        { "externalId": "race", "title": "Find and fix a race with the race detector", "kind": "review", "estimatedMinutes": 60 }
+      ]
+    },
+    {
+      "externalId": "go-service",
+      "title": "Ship a production-minded service",
+      "purpose": "Combine HTTP, persistence, testing, observability, and graceful shutdown.",
+      "prerequisites": ["go-concurrency"],
+      "items": [
+        { "externalId": "api", "title": "Build a REST API with request validation and tests", "kind": "project", "estimatedMinutes": 240, "evidenceRequired": true },
+        { "externalId": "operate", "title": "Add structured logs, health checks, and graceful shutdown", "kind": "project", "estimatedMinutes": 120, "evidenceRequired": true }
+      ]
+    }
+  ]
+}
